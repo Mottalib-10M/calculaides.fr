@@ -5,15 +5,15 @@ import { route } from '../../i18n/routes';
 const lang = 'en';
 const updated = '2026-10-09';
 ---
-<PageLayout title={`Cookies – ${SITE_NAMES[lang]}`} description="CalculAides sets no cookie and loads no analytics: the income, rent and family details you type into its calculators never leave your device. No banner, nothing to accept." lang={lang} noindex={true} breadcrumbs={[{ label: 'Cookies' }]} showAuthor={false}>
+<PageLayout title={`Cookies – ${SITE_NAMES[lang]}`} description="CalculAides sets no cookie; an anonymous, cookie-free stability check runs, and the income, rent and family details you type into its calculators never leave your device. No banner, nothing to accept." lang={lang} noindex={true} breadcrumbs={[{ label: 'Cookies' }]} showAuthor={false}>
   <div class="prose prose-slate max-w-none">
     <h1>Cookies</h1>
     <p>CalculAides <strong>sets no cookie</strong>. It shows no consent banner, because there is nothing to accept or refuse. Details of processing are in the <a href={route('privacy', lang)}>privacy policy</a>.</p>
     <h2>The calculators keep nothing</h2>
     <p>Housing aid, activity bonus, RSA, family allowance or AAH: each calculator runs in your browser. Your rent, income and number of children are written to no cookie, no local storage and no server; they vanish when you close the page.</p>
-    <h2>No measurement tool</h2>
-    <p>The site loads no audience statistics, no session recording, no advertising and no social media button. The calculator embedded on other sites in an iframe follows the same rule.</p>
+    <h2>Anonymous, cookie-free stability monitoring</h2>
+    <p>The site loads Microsoft Clarity in its cookie-free mode to catch errors, slow pages and dead clicks: no cookie is set, each page view gets a one-off identifier, and content and your inputs are masked. There are no audience statistics, no advertising and no social media button. Blocking clarity.ms stops it; the calculators keep working. The calculator embedded on other sites in an iframe loads nothing.</p>
     <h2>What could change</h2>
-    <p>If a measurement tool were ever added, this page and the privacy policy would be updated before it goes live, stating its purpose and how to object. Questions: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Updated: {updated}.</p>
+    <p>If another tool were ever added, this page and the privacy policy would be updated before it goes live, stating its purpose and how to object. Questions: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Updated: {updated}.</p>
   </div>
 </PageLayout>
