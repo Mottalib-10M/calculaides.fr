@@ -1,0 +1,25 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { YEAR, LAST_UPDATED, AUTHOR_NAME, CONTACT_EMAIL, AUTHOR_ROLE } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { personSchema, organizationSchema, breadcrumbSchema, profilePageSchema } from '../../lib/seo';
+import { displayDate } from '../../lib/format';
+const lang = 'en';
+---
+<PageLayout title="CalculAides: Who Builds These CAF Calculators, and How" description="Who publishes CalculAides, why independent calculators for French CAF benefits in 2026, how rates are read in the Journal officiel, how to report an error." lang={lang} jsonLd={[personSchema(lang), organizationSchema(lang), profilePageSchema({ path: route('about', lang), lang }), breadcrumbSchema([{ name: 'Home', path: route('home', lang) }, { name: 'About', path: route('about', lang) }])]} breadcrumbs={[{ label: 'About' }]}>
+  <header class="mb-6"><h1 class="text-3xl font-bold text-navy-900 md:text-4xl">About CalculAides</h1></header>
+  <div class="prose prose-slate max-w-none">
+    <div class="not-prose mb-6"><p class="text-lg font-semibold text-navy-900">{AUTHOR_NAME}</p><p class="text-navy-700">{AUTHOR_ROLE[lang]}</p></div>
+    <p>CalculAides is published by Radif Partners. It answers a question millions of households in France ask every month: how much will the CAF (Caisse d’allocations familiales, the family allowance fund) pay, and what happens if my pay, my rent or my family changes? Housing aid (APL), the activity bonus (prime d’activité), the RSA minimum income, family allowances, the back-to-school allowance, the birth grant, the parental leave benefit (PreParE) and the disability allowance (AAH) each have their own calculator, and the home page adds them up.</p>
+    <h2>Why an independent site</h2>
+    <p>The CAF’s own simulator gives a figure without showing how it got there. Yet each benefit follows a precise formula published in the Journal officiel: a rent ceiling by zone, a flat-rate income for students, 59.85% of earnings for the activity bonus, income bands for family allowances. We show every step of the sum, with the text behind it, so that anyone can see why their aid goes up or down. For newcomers to France, that also means explaining words the CAF never translates.</p>
+    <h2>How amounts are set</h2>
+    <p>Each value (flat-rate amount, ceiling, rate, allowance) is read on its official source, service-public.fr or Légifrance, then written once in a dated parameter file. Pages and calculators read that file: when benefits are uprated on 1 April and housing aid on 1 October, one update is enough. Worked examples published by the administration, such as the RSA of a couple with two children, are replayed by automated tests before each release. Details are in the <a href={route('method', lang)}>calculation method</a>.</p>
+    <h2>What we are not</h2>
+    <p>Radif Partners is not the CAF, the MSA (the farm workers’ fund) or any government body, and offers no paperwork service. We open no file, ask for no login and send nothing anywhere. An amount shown here is an estimate: only your fund works out your real entitlement from your complete file.</p>
+    <h2>Funding and data</h2><p>The site is free and needs no account. It sets no cookie and stores none of your inputs: calculations run in your browser. If it ever carries advertising, it will never sit above a calculator.</p>
+    <h2>A French version</h2><p>Every page also exists in French, the language of the CAF letters and forms; switching language keeps you on the same subject.</p>
+    <h2>Write to us</h2><p>A rate has changed, a figure looks wrong, a situation is missing: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. See also the <a href={route('editorial', lang)}>editorial policy</a> and the <a href={route('terms', lang)}>legal notice</a>.</p>
+    <p class="text-sm text-navy-600">{YEAR} rates, checked on <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time>.</p>
+  </div>
+</PageLayout>

@@ -1,0 +1,25 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { YEAR, LAST_UPDATED, AUTHOR_NAME, CONTACT_EMAIL, AUTHOR_ROLE } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+import { personSchema, organizationSchema, breadcrumbSchema, profilePageSchema } from '../../lib/seo';
+import { displayDate } from '../../lib/format';
+const lang = 'fr';
+---
+<PageLayout title="CalculAides : qui édite ces simulateurs d’aides CAF 2026" description="Qui édite CalculAides, pourquoi des simulateurs indépendants des aides CAF 2026, comment les barèmes sont lus au Journal officiel, comment signaler une erreur." lang={lang} jsonLd={[personSchema(lang), organizationSchema(lang), profilePageSchema({ path: route('about', lang), lang }), breadcrumbSchema([{ name: 'Accueil', path: route('home', lang) }, { name: 'À propos', path: route('about', lang) }])]} breadcrumbs={[{ label: 'À propos' }]}>
+  <header class="mb-6"><h1 class="text-3xl font-bold text-navy-900 md:text-4xl">À propos de CalculAides</h1></header>
+  <div class="prose prose-slate max-w-none">
+    <div class="not-prose mb-6"><p class="text-lg font-semibold text-navy-900">{AUTHOR_NAME}</p><p class="text-navy-700">{AUTHOR_ROLE[lang]}</p></div>
+    <p>CalculAides est édité par Radif Partners. Le site répond à une question que se posent chaque mois des millions de foyers : combien la CAF va-t-elle verser, et que se passe-t-il si mon salaire, mon loyer ou ma famille change ? L’APL, la prime d’activité, le RSA, les allocations familiales, l’allocation de rentrée scolaire, la prime à la naissance, la PreParE et l’AAH y ont chacune leur simulateur, et la page d’accueil les additionne.</p>
+    <h2>Pourquoi un site indépendant</h2>
+    <p>Le simulateur officiel de la CAF donne un montant, sans dire comment il l’obtient. Or ces aides dépendent de formules précises, publiées au Journal officiel : un loyer plafond par zone, un forfait de ressources pour les étudiants, 59,85 % des revenus d’activité pour la prime, des tranches de revenus pour les allocations familiales. Nous montrons chaque étape du calcul, avec le texte qui la fonde, pour que chacun comprenne pourquoi l’aide monte ou baisse.</p>
+    <h2>Comment les montants sont établis</h2>
+    <p>Chaque valeur (montant forfaitaire, plafond, taux, abattement) est relevée sur sa source officielle, service-public.fr ou Légifrance, puis écrite une seule fois dans un fichier de paramètres daté. Pages et simulateurs lisent ce fichier : quand les prestations sont revalorisées, au 1er avril, et les aides au logement, au 1er octobre, une seule mise à jour suffit. Les exemples publiés par l’administration, comme le RSA d’un couple avec deux enfants, sont rejoués par des tests avant chaque publication. Le détail est dans la <a href={route('method', lang)}>méthode de calcul</a>.</p>
+    <h2>Ce que nous ne sommes pas</h2>
+    <p>Radif Partners n’est ni la CAF, ni la MSA, ni une administration, ni un service d’aide aux démarches. Nous n’ouvrons aucun dossier, ne demandons aucun identifiant et ne transmettons rien. Un montant affiché ici est une estimation : seule votre caisse calcule le droit réel, à partir de votre dossier complet.</p>
+    <h2>Financement et données</h2><p>Le site est gratuit et sans inscription. Il ne dépose aucun cookie et n’enregistre aucune saisie : les calculs se font dans votre navigateur. S’il affiche un jour de la publicité, elle ne sera jamais placée au-dessus d’un simulateur.</p>
+    <h2>Une version anglaise</h2><p>Chaque page existe en anglais pour les étrangers installés en France, étudiants, salariés ou familles, qui découvrent le vocabulaire de la CAF : les termes français y sont expliqués, les montants restent en euros.</p>
+    <h2>Nous écrire</h2><p>Un barème a changé, un montant vous semble faux, un cas n’est pas couvert : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Voir aussi la <a href={route('editorial', lang)}>charte éditoriale</a> et les <a href={route('terms', lang)}>mentions légales</a>.</p>
+    <p class="text-sm text-navy-600">Barèmes {YEAR}, vérifiés le <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'fr-FR')}</time>.</p>
+  </div>
+</PageLayout>

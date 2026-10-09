@@ -1,0 +1,23 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'en';
+---
+<PageLayout title={`Contact – ${SITE_NAMES[lang]}`} description="Write to the publisher of CalculAides: report a rate that has changed or an amount that looks wrong, ask about the method, or embed a calculator on your site." lang={lang} noindex={true} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>One address, read every week: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Report a wrong amount</h2>
+    <p>Give the page, the calculator’s <strong>share link</strong> (it carries your inputs and nothing else) and, if you have it, the amount notified by your CAF or the official text that contradicts us: service-public sheet, decree, order. A confirmed gap is fixed in the parameter file and added to the tests, as set out in the <a href={route('editorial', lang)}>editorial policy</a>.</p>
+    <h2>What we cannot do</h2>
+    <p>We have no access to any claimant file and cannot check your rights, make a claim or appeal a decision for you. For your own situation, contact your CAF (or the MSA if you are under the farm scheme), a France services help desk or your town’s social action centre (CCAS).</p>
+    <h2>Embed a calculator</h2>
+    <p>Charities, social centres, council housing services and newsrooms can embed the housing aid calculator for free. The code is on the <a href={route('widget', lang)}>embed page</a>.</p>
+    <h2>Response time</h2><p>Usually within five working days, wrong amounts first. Every parameter is reviewed at least every {REVIEW_CYCLE_MONTHS} months and at each uprating.</p>
+    <h2>Publisher</h2>
+    <LegalIdentity lang={lang} />
+    <p>See the <a href={route('terms', lang)}>legal notice</a>. Editor in charge: {AUTHOR_NAME}. Updated: {LAST_UPDATED}.</p>
+  </div>
+</PageLayout>

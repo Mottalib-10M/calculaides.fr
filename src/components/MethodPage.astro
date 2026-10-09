@@ -1,0 +1,95 @@
+---
+/** Méthode et sources (page de confiance, RECETTE §8.2) : formules, barèmes datés, tests, limites. */
+import PageLayout from '../layouts/PageLayout.astro';
+import { route, type Locale } from '../i18n/routes';
+import { P } from '../lib/engine/params';
+import * as M from '../lib/engine/index';
+import { formatMoney, formatPercent, formatNumber, displayDate } from '../lib/format';
+import { breadcrumbSchema, webPageSchema } from '../lib/seo';
+import { LAST_UPDATED, CONTACT_EMAIL, REVIEW_CYCLE_MONTHS } from '../data/site-config';
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const $ = (n: number, d = 0) => formatMoney(n, d, lang);
+const pc = (x: number, d = 1) => formatPercent(x, d, lang);
+const A = P.apl;
+const title = fr ? 'CalculAides : méthode de calcul 2026, barèmes et limites' : 'CalculAides: 2026 Calculation Method, Rates and Limits';
+const description = fr ? 'Méthode 2026 de CalculAides : formules de l’APL, de la prime d’activité et du RSA, barèmes d’avril et d’octobre, tests rejoués, limites des estimations.' : 'CalculAides 2026 method: formulas for housing aid, the activity bonus and the RSA, April and October scales, tests replayed at release, limits of the estimates.';
+const h1 = fr ? 'Méthode de calcul et sources' : 'Calculation method and sources';
+const path = route('method', lang);
+const sources = Object.values(P.sources);
+const ex = M.apl({ zone: 2, couple: false, enfants: 0, loyer: 450, revenusAnnuels: 12000 });
+const exPa = M.primeActivite({ couple: false, enfants: 0, revenu1: P.smic.mensuel_net });
+---
+<PageLayout title={title} description={description} lang={lang} jsonLd={[webPageSchema({ name: h1, description, path, lang }), breadcrumbSchema([{ name: fr ? 'Accueil' : 'Home', path: route('home', lang) }, { name: h1, path }])]} breadcrumbs={[{ label: h1 }]}>
+  <header class="mb-6"><h1 class="text-3xl font-bold text-navy-900 md:text-4xl">{h1}</h1></header>
+  {fr ? (
+  <div class="prose prose-slate max-w-none">
+    <p>Tous les montants du site viennent d’un seul fichier de paramètres, relevé le <time datetime={P.retrieved_at}>{displayDate(P.retrieved_at, 'fr-FR')}</time>, où chaque valeur porte sa source. Les pages et les simulateurs lisent ce fichier : aucun montant réglementaire n’est tapé à la main dans un texte, et une valeur corrigée l’est partout à la fois.</p>
+    <h2>Deux dates de revalorisation</h2>
+    <p>Le RSA, la prime d’activité, l’AAH et les prestations familiales sont revalorisés au 1er avril : les montants du site sont ceux du 1er avril 2026 (décrets n° 2026-220 et 2026-222 du 30 mars 2026, instruction DSS/2B/2026/46 pour la base mensuelle des allocations familiales, {$(P.bmaf, 2)}). Les aides au logement sont revalorisées au 1er octobre : le site applique l’arrêté du 28 septembre 2026 (+1,15 %). Les plafonds de ressources des prestations familiales s’appliquent aux revenus de 2024.</p>
+    <h2>Aides au logement</h2>
+    <p>APL, ALF et ALS suivent le même barème en location (code de la construction et de l’habitation, art. D823-16 et D823-17). L’aide vaut L + C − Pp − {$(A.minoration)} : L est le loyer retenu dans la limite du loyer plafond de la zone et de la composition du foyer ({pc(A.coef_colocation, 0)} de ce plafond en colocation, {pc(A.coef_chambre, 0)} pour une chambre), C le forfait charges ({$(A.forfait_charges.base, 2)} plus {$(A.forfait_charges.par_enfant, 2)} par personne à charge). La participation personnelle Pp = P0 + Tp × (R − R0), où P0 est le plus élevé de {pc(A.p0_taux)} de L + C et de {$(A.p0_min, 2)}, Tp la somme d’un taux lié à la famille ({pc(A.tf.seul, 2)} pour une personne seule) et d’un taux lié au loyer, R les ressources des douze derniers mois après abattement de {pc(A.abattement_frais_pro, 0)} arrondies à la centaine supérieure, et R0 un abattement forfaitaire ({$(A.r0.seul)} pour une personne seule). Un étudiant est compté pour au moins {$(A.etudiant_forfait_ressources)} ({$(A.etudiant_forfait_ressources - A.etudiant_minoration_boursier)} s’il est boursier). L’aide diminue quand le loyer réel dépasse 3,4 fois le plafond en zone 1, 2,5 fois ailleurs, et disparaît à 4 et 3,1 fois. Elle n’est pas versée sous {$(A.seuil_versement)}.</p>
+    <p>Exemple : personne seule en zone 2, loyer de 450 €, 12 000 € de revenus nets imposables : loyer retenu {$(ex.loyerRetenu, 2)}, charges {$(ex.charges, 2)}, participation {$(ex.pp, 2)}, aide estimée {$(ex.aide, 2)} par mois.</p>
+    <p><strong>Une valeur n’est pas de 2026.</strong> L’abattement R0 est revalorisé chaque 1er janvier par arrêté. Nous n’avons trouvé aucun arrêté pour 2026 à la date du relevé : le site applique la dernière valeur publiée, celle du 1er janvier 2025. Les foyers et résidences conventionnés (logements-foyers) ont une formule propre fondée sur la redevance : le simulateur leur applique la règle des chambres, une approximation signalée sur les pages concernées. La réduction de loyer de solidarité des logements HLM n’est pas modélisée.</p>
+    <h2>Prime d’activité et RSA</h2>
+    <p>Le montant forfaitaire ({$(P.pa.montant_forfaitaire, 2)} pour la prime, {$(P.rsa.montant_forfaitaire, 2)} pour le RSA) est majoré de 50 % pour la deuxième personne du foyer, de 30 % pour chacune des suivantes et de 40 % par enfant à partir du troisième ; le parent isolé a droit à {formatNumber(P.pa.isole.base * 100, 3, 'fr')} % plus {formatNumber(P.pa.isole.par_enfant * 100, 3, 'fr')} % par enfant. Prime d’activité = forfaitaire + {pc(P.pa.taux_revenus, 2)} des revenus d’activité + bonifications − le plus élevé des deux montants entre le forfaitaire et les ressources du foyer. La bonification individuelle est nulle sous {formatNumber(P.pa.bonif.seuil_smic_h, 0, 'fr')} fois le Smic horaire brut ({$(M.seuilBonification(), 2)}), croît jusqu’à {formatNumber(P.pa.bonif.plafond_smic_h, 0, 'fr')} fois ({$(M.plafondBonification(), 2)}) et plafonne à {$(M.bonificationMax(), 2)}. RSA = forfaitaire − ressources − forfait logement. Le forfait logement vaut 12 %, 16 % ou 16,5 % du montant forfaitaire d’une, deux ou trois personnes et plus, quand le foyer perçoit une aide au logement ou ne paie pas de loyer. Seuils de versement : {$(P.pa.minimum_verse)} pour la prime, {$(P.rsa.minimum_verse)} pour le RSA. Exemple : personne seule au Smic net ({$(P.smic.mensuel_net, 2)}), sans aide au logement : prime estimée {$(exPa.prime, 2)}.</p>
+    <h2>Prestations familiales et AAH</h2>
+    <p>Les allocations familiales, l’allocation de rentrée scolaire, la prime à la naissance, l’allocation de base, la PreParE, le complément familial et l’ASF reprennent les montants nets de CRDS publiés par service-public au 1er avril 2026. Les plafonds sont comparés au revenu net catégoriel de 2024. Le complément dégressif des allocations familiales et l’allocation de rentrée différentielle suivent les règles publiées : la somme versée diminue de l’excédent de ressources. L’AAH ({$(P.aah.montant_max, 2)} au maximum) est comparée aux seules ressources de la personne depuis le 1er octobre 2023 ; un salaire en milieu ordinaire est retenu après un abattement de 80 % jusqu’à 30 % du Smic brut et de 40 % au-delà.</p>
+    <h2>Les tests qui bloquent la publication</h2>
+    <ul>
+      <li>Montants du RSA et de la prime d’activité pour chaque composition publiée par service-public, et forfaits logement à 78,20, 156,41 et 193,55 €.</li>
+      <li>L’exemple officiel du RSA : couple avec deux enfants, aide au logement et allocations familiales, 1 022,75 €.</li>
+      <li>Loyers plafonds, plafonds de chambre et forfaits charges de l’arrêté du 28 septembre 2026.</li>
+      <li>Allocations familiales par tranche, majoration et l’exemple officiel du complément dégressif (trois enfants, 87 000 €).</li>
+      <li>Allocation de rentrée, prime à la naissance, allocation de base, PreParE, complément familial, ASF et AAH, aux montants et plafonds publiés.</li>
+      <li>Chaque mini-simulateur, dans les deux langues, sans valeur manquante.</li>
+    </ul>
+    <h2>Ce que les simulateurs ne font pas</h2>
+    <ul>
+      <li>Ils ne remplacent pas le calcul de la CAF, qui connaît toutes vos ressources, vos changements de situation et les règles particulières (neutralisation de revenus, abattements spécifiques, rappels).</li>
+      <li>Ils ne traitent ni l’outre-mer, ni Mayotte, ni l’accession à la propriété, ni les aides de garde d’enfants.</li>
+      <li>Le simulateur global de l’accueil suppose des revenus de 2024 égaux à douze fois les revenus mensuels saisis, et des enfants scolarisés comptés au montant des 6 à 10 ans.</li>
+    </ul>
+    <h2>Mises à jour</h2>
+    <p>Revue à chaque revalorisation et au moins tous les {REVIEW_CYCLE_MONTHS} mois. Une erreur signalée à <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> est vérifiée sur la source, corrigée, puis transformée en test. Voir la <a href={route('editorial', lang)}>charte éditoriale</a>.</p>
+    <h2>Toutes les sources</h2>
+    <ul>{sources.map((s) => <li><a href={s.url} rel="nofollow noopener" target="_blank">{s.label.fr}</a></li>)}</ul>
+    <p class="text-sm text-navy-600">Dernière vérification : <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'fr-FR')}</time>.</p>
+  </div>
+  ) : (
+  <div class="prose prose-slate max-w-none">
+    <p>Every amount on the site comes from a single parameter file, checked on <time datetime={P.retrieved_at}>{displayDate(P.retrieved_at, 'en-GB')}</time>, where each value names its source. Pages and calculators read that file: no regulated amount is typed into a text by hand, and a corrected value changes everywhere at once.</p>
+    <h2>Two uprating dates</h2>
+    <p>The RSA, the activity bonus (prime d’activité), the disability allowance (AAH) and family benefits are uprated on 1 April: the site uses the amounts of 1 April 2026 (decrees 2026-220 and 2026-222 of 30 March 2026, instruction DSS/2B/2026/46 for the monthly family-allowance base, {$(P.bmaf, 2)}). Housing aid is uprated on 1 October: the site applies the order of 28 September 2026 (+1.15%). Family-benefit income ceilings apply to 2024 income.</p>
+    <h2>Housing aid</h2>
+    <p>APL, ALF and ALS follow one scale for tenants (Construction and Housing Code, articles D823-16 and D823-17). Aid equals L + C − Pp − {$(A.minoration)}: L is the rent counted up to the ceiling for the zone and household ({pc(A.coef_colocation, 0)} of that ceiling in a flat-share, {pc(A.coef_chambre, 0)} for a room), C the service-charge allowance ({$(A.forfait_charges.base, 2)} plus {$(A.forfait_charges.par_enfant, 2)} per dependant). Own contribution Pp = P0 + Tp × (R − R0), where P0 is the higher of {pc(A.p0_taux)} of L + C and {$(A.p0_min, 2)}, Tp adds a family rate ({pc(A.tf.seul, 2)} for a single person) and a rent rate, R is income over the last twelve months after a {pc(A.abattement_frais_pro, 0)} allowance, rounded up to the next hundred, and R0 a flat allowance ({$(A.r0.seul)} for a single person). A student counts for at least {$(A.etudiant_forfait_ressources)} ({$(A.etudiant_forfait_ressources - A.etudiant_minoration_boursier)} with a grant). Aid tapers once actual rent exceeds 3.4 times the ceiling in zone 1, 2.5 times elsewhere, and stops at 4 and 3.1 times. It is not paid below {$(A.seuil_versement)}.</p>
+    <p>Example: single person in zone 2, €450 rent, €12,000 of taxable net income: rent counted {$(ex.loyerRetenu, 2)}, charges {$(ex.charges, 2)}, contribution {$(ex.pp, 2)}, estimated aid {$(ex.aide, 2)} a month.</p>
+    <p><strong>One value is not from 2026.</strong> The R0 allowance is uprated each 1 January by order. We found no order for 2026 when we checked, so the site applies the latest published value, from 1 January 2025. Approved hostels and residences (logements-foyers) have their own fee-based formula: the calculator applies the room rule to them, an approximation flagged on the pages concerned. The solidarity rent reduction in social housing (RLS) is not modelled.</p>
+    <h2>Activity bonus and RSA</h2>
+    <p>The flat-rate amount ({$(P.pa.montant_forfaitaire, 2)} for the bonus, {$(P.rsa.montant_forfaitaire, 2)} for the RSA) rises by 50% for the household’s second person, 30% for each further one and 40% per child from the third; a lone parent gets {formatNumber(P.pa.isole.base * 100, 3, 'en')}% plus {formatNumber(P.pa.isole.par_enfant * 100, 3, 'en')}% per child. Activity bonus = flat rate + {pc(P.pa.taux_revenus, 2)} of earnings + top-ups − the higher of the flat rate and household resources. The individual top-up is zero below {P.pa.bonif.seuil_smic_h} times the gross hourly minimum wage ({$(M.seuilBonification(), 2)}), rises up to {P.pa.bonif.plafond_smic_h} times ({$(M.plafondBonification(), 2)}) and caps at {$(M.bonificationMax(), 2)}. RSA = flat rate − resources − housing flat rate. The housing flat rate is 12%, 16% or 16.5% of the flat-rate amount for one, two, or three or more people, when the household gets housing aid or pays no rent. Payment thresholds: {$(P.pa.minimum_verse)} for the bonus, {$(P.rsa.minimum_verse)} for the RSA. Example: single person on the net minimum wage ({$(P.smic.mensuel_net, 2)}), no housing aid: estimated bonus {$(exPa.prime, 2)}.</p>
+    <h2>Family benefits and AAH</h2>
+    <p>Family allowances, the back-to-school allowance, the birth grant, the Paje basic allowance, the PreParE, the family supplement and the ASF use the amounts net of CRDS published by service-public.fr for 1 April 2026. Ceilings are compared with 2024 net income (revenu net catégoriel). The tapering supplement of family allowances and the differential back-to-school allowance follow the published rules: the sum paid falls by the excess income. The AAH (up to {$(P.aah.montant_max, 2)}) has been compared with the claimant’s own income only since 1 October 2023; pay from an ordinary job counts after an 80% allowance up to 30% of the gross minimum wage and 40% above.</p>
+    <h2>Tests that block a release</h2>
+    <ul>
+      <li>RSA and activity bonus amounts for every household published by service-public.fr, and housing flat rates of €78.20, €156.41 and €193.55.</li>
+      <li>The official RSA example: couple with two children, housing aid and family allowances, €1,022.75.</li>
+      <li>Rent ceilings, room ceilings and service-charge allowances from the order of 28 September 2026.</li>
+      <li>Family allowances by band, the age supplement and the official tapering-supplement example (three children, €87,000).</li>
+      <li>Back-to-school allowance, birth grant, basic allowance, PreParE, family supplement, ASF and AAH at the published amounts and ceilings.</li>
+      <li>Every small calculator, in both languages, with no missing value.</li>
+    </ul>
+    <h2>What the calculators do not do</h2>
+    <ul>
+      <li>They do not replace the CAF’s calculation, which knows all your income, your changes of situation and the special rules (income neutralisation, specific allowances, back payments).</li>
+      <li>They do not cover the overseas departments, Mayotte, home-buyers’ housing aid or childcare benefits.</li>
+      <li>The home-page calculator assumes 2024 income equal to twelve times the monthly income entered, and counts school-age children at the 6-to-10 rate.</li>
+    </ul>
+    <h2>Updates</h2>
+    <p>Reviewed at each uprating and at least every {REVIEW_CYCLE_MONTHS} months. An error reported to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> is checked against the source, fixed, then turned into a test. See the <a href={route('editorial', lang)}>editorial policy</a>.</p>
+    <h2>All sources</h2>
+    <ul>{sources.map((s) => <li><a href={s.url} rel="nofollow noopener" target="_blank">{s.label.en}</a></li>)}</ul>
+    <p class="text-sm text-navy-600">Last checked: <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, 'en-GB')}</time>.</p>
+  </div>
+  )}
+</PageLayout>

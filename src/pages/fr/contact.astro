@@ -1,0 +1,23 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'fr';
+---
+<PageLayout title={`Contact – ${SITE_NAMES[lang]}`} description="Écrire à l’éditeur de CalculAides : signaler un barème qui a changé ou un montant qui paraît faux, poser une question sur la méthode, intégrer un simulateur." lang={lang} noindex={true} breadcrumbs={[{ label: 'Contact' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Contact</h1>
+    <p>Une seule adresse, lue chaque semaine : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Signaler une erreur de montant</h2>
+    <p>Indiquez la page, le <strong>lien de partage</strong> du simulateur (il reprend vos saisies, rien d’autre) et, si vous l’avez, le montant notifié par votre CAF ou le texte officiel qui le contredit : fiche service-public, décret, arrêté. Un écart confirmé est corrigé dans le fichier de paramètres et ajouté aux tests, comme le prévoit la <a href={route('editorial', lang)}>charte éditoriale</a>.</p>
+    <h2>Ce que nous ne pouvons pas faire</h2>
+    <p>Nous n’avons accès à aucun dossier d’allocataire et ne pouvons ni consulter vos droits, ni faire une demande, ni contester une décision à votre place. Pour votre situation personnelle, adressez-vous à votre CAF (ou à la MSA si vous relevez du régime agricole), à un point d’accueil France services ou au centre communal d’action sociale de votre commune.</p>
+    <h2>Intégrer un simulateur</h2>
+    <p>Associations, centres sociaux, services logement des communes, rédactions : le simulateur d’aide au logement s’intègre gratuitement en iframe. Le code est sur la page <a href={route('widget', lang)}>Intégrer le simulateur</a>.</p>
+    <h2>Délais</h2><p>Les signalements d’un montant faux passent avant tout le reste : comptez une semaine au plus pour une réponse. Les barèmes, eux, sont relus à chaque revalorisation d’avril et d’octobre, et au minimum une fois tous les {REVIEW_CYCLE_MONTHS} mois.</p>
+    <h2>Éditeur</h2>
+    <LegalIdentity lang={lang} />
+    <p>{AUTHOR_NAME} répond du contenu de CalculAides ; l’identité complète figure dans les <a href={route('terms', lang)}>mentions légales</a>. Page revue le {LAST_UPDATED}.</p>
+  </div>
+</PageLayout>

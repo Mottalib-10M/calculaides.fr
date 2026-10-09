@@ -1,0 +1,27 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'en';
+---
+<PageLayout title={`Editorial policy – ${SITE_NAMES[lang]}`} description="Where the CAF benefit rates published here come from, who answers for them, how often they are reviewed after each uprating, and what happens when an error is reported." lang={lang} noindex={true} breadcrumbs={[{ label: 'Editorial policy' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Editorial and corrections policy</h1>
+    <p>A welfare benefit can decide whether a household gets to the end of the month. A wrong figure may put someone off claiming, or make them count on money that never comes. Here is where our numbers come from and what we do when one is wrong.</p>
+    <h2>Responsibility</h2><p>Content and calculations are the responsibility of {AUTHOR_NAME}. Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Primary sources only</h2>
+    <ul>
+      <li><strong>Légifrance and the Journal officiel</strong>: Social Security Code, Construction and Housing Code, uprating decrees, housing aid orders;</li>
+      <li><strong>service-public.fr</strong>: the government’s benefit sheets, with their check date;</li>
+      <li><strong>the social security ministry’s official bulletins</strong>: instructions uprating family benefits.</li>
+    </ul>
+    <p>No amount is taken from a blog, a forum or another calculator. When a figure for the year has not yet been published, the page says so and uses the latest official value.</p>
+    <h2>Estimates, never decisions</h2><p>Every result is an estimate based on your inputs and the scale in force. Detailed rules (excluded income, special situations, back payments) are applied by the CAF on the file: the amount it notifies always prevails over ours.</p>
+    <h2>Tests before release</h2><p>Tables and examples published by the administration (RSA and activity bonus amounts by household, housing flat rates, family allowances by band, rent ceilings from the October order) are recalculated at every build. Any gap blocks the release.</p>
+    <h2>Update calendar</h2><p>Reviewed on 1 April (family benefits, RSA, activity bonus, AAH), on 1 October (housing aid) and at least every {REVIEW_CYCLE_MONTHS} months. The date shown comes from the parameter file.</p>
+    <h2>Handling errors</h2>
+    <ol><li>Check against the primary source.</li><li>Fix the parameters or code and add a test.</li><li>New date on the page concerned.</li></ol>
+    <h2>Independence</h2><p>No commercial link with any fund, paid paperwork service or advertiser. Any such relationship would be stated in the text.</p>
+    <p>See also the <a href={route('method', lang)}>calculation method</a>. Version: {LAST_UPDATED}.</p>
+  </div>
+</PageLayout>

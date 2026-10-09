@@ -1,0 +1,98 @@
+import { defineGuide, type Helpers } from '../../lib/guide-types';
+
+/** Exemple de la page : couple sans enfant, un conjoint à 700 € net, aide au logement perçue. */
+const sal = 700;
+const cpl = (h: Helpers, enfants = 0, revenus = 0, fl = true) => h.M.rsa({ couple: true, enfants, revenus, forfaitLogement: fl });
+
+export default defineGuide({
+  id: 'rsa-couple',
+  group: 'rsa',
+  order: 30,
+  mini: 'rsaCouple',
+  related: ['simulateur-rsa', 'rsa-personne-seule', 'rsa-allocations-familiales', 'rsa-cumul-salaire', 'prime-activite-couple'],
+  sources: ['spRsa', 'decretRsa2026', 'spPa'],
+  fr: {
+    slug: 'rsa-couple',
+    nav: 'RSA couple',
+    card: 'Un seul RSA pour deux : le barème du couple, l’effet du salaire du conjoint et la mise en couple.',
+    title: 'RSA couple 2026 : 977,54 € et le salaire du conjoint',
+    description: 'RSA couple 2026 : 977,54 € par mois sans enfant, 1 368,55 € avec deux enfants. Comment le salaire d’un conjoint réduit le droit du foyer, exemple et simulateur.',
+    h1: 'RSA en couple : un droit pour deux',
+    intro: 'En couple, la CAF ne calcule pas deux RSA : elle calcule celui du foyer, avec les revenus des deux conjoints dans le même panier.',
+    resume: (h) => `Un couple sans enfant ni ressource peut recevoir jusqu’à ${h.eur(h.M.forfaitaireRsa(true, 0), 2)} de RSA par mois depuis le 1er avril 2026, soit ${h.pct(1 + h.P.rsa.majoration.deuxieme, 0)} du montant d’une personne seule et non le double. Avec deux enfants, le montant forfaitaire monte à ${h.eur(h.M.forfaitaireRsa(true, 2), 2)}. Ce droit est unique pour le foyer : les salaires, allocations chômage et pensions des deux conjoints s’additionnent et se retirent ensemble. Si le couple touche une aide au logement, un forfait de ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 2)} s’ajoute à la déduction. Exemple : un conjoint qui gagne ${h.eur(sal)} net par mois, l’autre sans revenu, aidés pour le loyer, gardent environ ${h.eur(cpl(h, 0, sal).rsa, 2)} de RSA, et la prime d’activité vient compléter. Se mettre en couple peut donc réduire, voire supprimer, le RSA de chacun. Ces montants sont des estimations ; la CAF fixe le droit.`,
+    faqs: (h) => [
+      { q: 'Pourquoi le RSA d’un couple n’est-il pas le double de celui d’une personne seule ?', a: `Parce que le barème considère que deux adultes partagent certaines dépenses. La deuxième personne du foyer ne compte que pour ${h.pct(h.P.rsa.majoration.deuxieme, 0)} du montant de base : ${h.eur(h.P.rsa.montant_forfaitaire, 2)} plus ${h.eur(h.P.rsa.montant_forfaitaire * h.P.rsa.majoration.deuxieme, 2)}, soit ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. Le décret du 30 mars 2026 fixe la base, la majoration est prévue par le code de l’action sociale.` },
+      { q: 'Mon conjoint travaille à temps partiel, ai-je encore droit au RSA ?', a: `Souvent oui, mais réduit. Son salaire net est retiré du montant forfaitaire du couple. Avec ${h.eur(sal)} par mois, sans enfant et avec une aide au logement, le RSA estimé tombe à ${h.eur(cpl(h, 0, sal).rsa, 2)}. Au-delà d’environ ${h.eur(h.M.forfaitaireRsa(true, 0) - h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 0)} de revenus mensuels, il disparaît. La prime d’activité, calculée à part, peut alors prendre le relais.` },
+      { q: 'Je touche le RSA seul et je m’installe avec quelqu’un, que se passe-t-il ?', a: `Le dossier est recalculé sur le foyer à deux. Les ressources de votre nouveau conjoint entrent dans la moyenne des trois derniers mois et le montant forfaitaire passe à ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. Service-public demande de déclarer rapidement tout changement de situation familiale, et précise qu’une mise en couple peut aussi ouvrir de nouveaux droits. Un trop-perçu se rembourse sur deux ans.` },
+      { q: 'Mon conjoint touche 900 € de chômage, notre couple garde-t-il un RSA ?', a: `Sans enfant et avec une aide au logement, non : ${h.eur(h.M.forfaitaireRsa(true, 0), 2)} moins ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 2)} de forfait logement moins 900 € d’allocation donne un résultat négatif, et le RSA estimé est de ${h.eur(h.M.rsa({ couple: true, enfants: 0, revenus: 0, autres: 900, forfaitLogement: true }).rsa, 2)}. L’allocation chômage compte en entier, comme un salaire, mais elle n’ouvre pas la prime d’activité.` },
+      { q: 'En couple, une sanction peut-elle supprimer tout le RSA du foyer ?', a: 'Pas d’un coup. Selon service-public, la réduction décidée par le département pour non-respect du contrat d’engagement ne peut pas dépasser 50 % lorsque le foyer compte d’autres personnes que l’allocataire sanctionné, alors qu’elle peut atteindre 80 % pour une personne seule lors d’une première sanction. À l’issue de la réduction, une radiation reste possible.' },
+    ],
+    body: (h) => `
+<h2>Le barème du couple, enfant par enfant</h2>
+<p>Le ${h.src('decretRsa2026', 'décret du 30 mars 2026')} fixe le montant de base. Pour un couple, la deuxième personne ajoute ${h.pct(h.P.rsa.majoration.deuxieme, 0)}, le premier enfant ${h.pct(h.P.rsa.majoration.suivante, 0)}, le deuxième encore ${h.pct(h.P.rsa.majoration.suivante, 0)}, puis chaque enfant suivant ${h.pct(h.P.rsa.majoration.au_dela_troisieme_enfant, 0)}. Le forfait logement, lui, plafonne dès trois personnes.</p>
+${h.table(['Couple', 'Montant forfaitaire', 'Forfait logement', 'RSA sans revenu, avec aide au logement'], [0, 1, 2, 3].map((e) => [e ? `${e} enfant${e > 1 ? 's' : ''}` : 'Sans enfant', h.eur(h.M.forfaitaireRsa(true, e), 2), h.eur(cpl(h, e).fl, 2), h.eur(cpl(h, e).rsa, 2)]), 'Barème du 1er avril 2026, hors allocations familiales (estimation)', ['l', 'r', 'r', 'r'])}
+<p>Ce tableau laisse de côté les allocations familiales, qui comptent aussi dans les ressources dès le deuxième enfant. Pour une famille, le montant réellement versé est donc plus bas ; la page ${h.a('rsa-allocations-familiales', 'RSA et allocations familiales')} fait le calcul complet.</p>
+<!--mini:rsaCouple-->
+
+<h2>Julie et Marc : un salaire qui se partage</h2>
+<p>Julie et Marc vivent ensemble à Lille, sans enfant. Marc a trouvé un poste à mi-temps payé ${h.eur(sal)} net par mois. Julie n’a plus de revenu. Ils touchent une aide au logement. Le montant forfaitaire du couple est de ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. La CAF retire le forfait logement de deux personnes, ${h.eur(cpl(h, 0, sal).fl, 2)}, puis le salaire de Marc. Il reste ${h.eur(cpl(h, 0, sal).rsa, 2)} de RSA pour le foyer.</p>
+<p>Ce que beaucoup de couples ne voient pas : ce RSA n’appartient pas à Julie. Il est versé au foyer, et le salaire de Marc le réduit autant que s’il était celui de Julie. Si Marc passe à temps plein au Smic, le RSA disparaît. En revanche, la ${h.a('prime-activite-couple', 'prime d’activité du couple')}, calculée par la CAF selon une autre formule décrite par ${h.src('spPa', 'service-public')}, valorise ce salaire : elle n’en retire qu’une partie. Les deux aides se demandent séparément.</p>
+
+<h2>Avec des enfants, trois ressources à retirer</h2>
+<p>Prenons maintenant un couple avec deux enfants de moins de 14 ans, aidé pour son logement. L’un des parents gagne ${h.eur(1000)} net par mois, l’autre reste au foyer. Le montant forfaitaire grimpe à ${h.eur(h.M.forfaitaireRsa(true, 2), 2)}. Mais trois montants s’en retirent : le salaire, le forfait logement de ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 4, h.P.rsa), 2)}, et les ${h.eur(h.P.af.tranches_nettes.deux[0], 2)} d’allocations familiales versées pour deux enfants. Le RSA estimé du foyer n’est plus que de ${h.eur(h.M.rsa({ couple: true, enfants: 2, revenus: 1000, autres: h.P.af.tranches_nettes.deux[0], forfaitLogement: true }).rsa, 2)}. Le revenu disponible du couple reste pourtant supérieur à celui d’un foyer sans salaire, car la prime d’activité s’ajoute. C’est la raison pour laquelle un couple avec enfants ne doit jamais juger une reprise d’emploi sur la seule baisse du RSA.</p>
+
+<h2>La mise en couple, moment à risque</h2>
+<p>Deux personnes seules qui touchent chacune le RSA perçoivent ensemble, sans aide au logement, ${h.eur(2 * h.P.rsa.montant_forfaitaire, 2)}. Une fois en couple, leur foyer n’a plus droit qu’à ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}, soit ${h.eur(2 * h.P.rsa.montant_forfaitaire - h.M.forfaitaireRsa(true, 0), 2)} de moins chaque mois. Ce n’est pas une sanction, c’est le barème. Au sens de service-public, le couple recouvre le mariage, le Pacs et le concubinage, c’est-à-dire l’union libre : vivre ensemble sans être mariés suffit à former un foyer commun.</p>
+<p>Le retard de déclaration coûte cher. La ${h.src('spRsa', 'fiche RSA de service-public')} rappelle que tout changement de situation familiale doit être signalé rapidement ; à défaut, la CAF peut réclamer pendant deux ans les sommes versées en trop, par retenues sur les prestations à venir. La commission de recours amiable peut être saisie pour demander une remise de dette.</p>
+
+<h2>Les règles qui changent quand on est deux</h2>
+<p>Plusieurs règles de réduction ne visent que l’allocataire sans conjoint. L’hospitalisation de plus de 60 jours, qui divise le RSA par deux pour une personne seule, ne s’applique pas à un couple. En cas d’incarcération de l’un des conjoints au-delà de 60 jours, le droit de l’autre est réexaminé et la personne détenue sort du foyer pour le calcul. Côté sanctions, la réduction est limitée à 50 % dès que le foyer compte une autre personne.</p>
+<p>L’accompagnement passe par un référent unique désigné par l’organisme d’orientation, et par un contrat d’engagement. Si les ressources du foyer sont en moyenne inférieures à 500 € par mois, la recherche d’emploi devient une obligation, selon service-public.</p>
+
+<h2>Déclarer à deux sans se tromper</h2>
+<p>La déclaration trimestrielle est commune. Depuis le 1er mars 2025, elle est préremplie avec les salaires et allocations des deux conjoints, en montant net social, sur les mois M-2 à M-4. Chacun vérifie ses lignes ; une pension alimentaire reçue s’ajoute à la main. Le ${h.a('simulateur-rsa', 'simulateur RSA')} permet de tester l’effet d’une reprise d’emploi de l’un ou de l’autre avant de la déclarer, et la page ${h.a('rsa-cumul-salaire', 'RSA et salaire')} détaille le relais par la prime d’activité.</p>
+`,
+  },
+  en: {
+    slug: 'rsa-couple',
+    nav: 'RSA for couples',
+    card: 'One RSA for two: the couple scale, the effect of a partner’s wages and moving in together.',
+    title: 'RSA Couple 2026: €977.54 a Month and Your Partner’s Pay',
+    description: 'RSA for a couple in 2026: €977.54 a month with no children, €1,368.55 with two. How one partner’s pay cuts the household’s RSA, with an example and calculator.',
+    h1: 'RSA as a couple: one entitlement for two',
+    intro: 'For a couple, the CAF does not work out two RSA payments: it works out the household’s, with both partners’ income in the same pot.',
+    resume: (h) => `A couple with no children and no income can receive up to ${h.eur(h.M.forfaitaireRsa(true, 0), 2)} of RSA (revenu de solidarité active, France’s minimum income) a month since 1 April 2026. That is ${h.pct(1 + h.P.rsa.majoration.deuxieme, 0)} of the single-person amount, not double. With two children, the flat rate rises to ${h.eur(h.M.forfaitaireRsa(true, 2), 2)}. There is one entitlement per household: both partners’ wages, unemployment benefit and pensions are added up and deducted together. If the couple receives housing aid, a flat ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 2)} housing deduction also applies. Example: one partner earning ${h.eur(sal)} net a month, the other with no income, both helped with rent, keep about ${h.eur(cpl(h, 0, sal).rsa, 2)} of RSA, and the prime d’activité (in-work bonus) tops it up. Moving in together can therefore cut or end each person’s RSA. These figures are estimates; the CAF (family benefits office) decides the entitlement.`,
+    faqs: (h) => [
+      { q: 'Why is RSA for a couple not twice the single-person rate?', a: `Because the scale assumes two adults share some costs. The second person counts for only ${h.pct(h.P.rsa.majoration.deuxieme, 0)} of the base amount: ${h.eur(h.P.rsa.montant_forfaitaire, 2)} plus ${h.eur(h.P.rsa.montant_forfaitaire * h.P.rsa.majoration.deuxieme, 2)}, giving ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. The decree of 30 March 2026 sets the base; the uplift for extra household members comes from the Social Action Code.` },
+      { q: 'My partner works part-time, can we still get RSA?', a: `Often yes, but less. Their net pay is taken off the couple’s flat rate. With ${h.eur(sal)} a month, no children and housing aid, the estimate drops to ${h.eur(cpl(h, 0, sal).rsa, 2)}. Above roughly ${h.eur(h.M.forfaitaireRsa(true, 0) - h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 0)} of monthly income it disappears. The prime d’activité, worked out separately, can then take over.` },
+      { q: 'I get RSA on my own and am moving in with someone, what happens?', a: `Your file is recalculated for a two-person household. Your new partner’s income joins the three-month average and the flat rate becomes ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. Service-public.fr asks you to report any change in family situation promptly, and notes that moving in together can also open new rights. Any overpayment is reclaimed over up to two years.` },
+      { q: 'My partner gets €900 of unemployment benefit, do we keep any RSA?', a: `With no children and housing aid, no: ${h.eur(h.M.forfaitaireRsa(true, 0), 2)} minus the ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 2, h.P.rsa), 2)} housing deduction minus €900 of benefit goes below zero, so the estimate is ${h.eur(h.M.rsa({ couple: true, enfants: 0, revenus: 0, autres: 900, forfaitLogement: true }).rsa, 2)}. Unemployment benefit counts in full, like a wage, but unlike a wage it does not open the activity bonus.` },
+      { q: 'As a couple, can a penalty wipe out the whole household’s RSA?', a: 'Not in one go. According to service-public.fr, a cut decided by the département (local council) for breaching the engagement contract cannot exceed 50% when the household includes people other than the claimant concerned, whereas it can reach 80% for a single person on a first penalty. Removal from RSA remains possible once the reduction period ends.' },
+    ],
+    body: (h) => `
+<h2>The couple scale, child by child</h2>
+<p>The ${h.src('decretRsa2026', 'decree of 30 March 2026')} sets the base amount. For a couple, the second adult adds ${h.pct(h.P.rsa.majoration.deuxieme, 0)}, the first child ${h.pct(h.P.rsa.majoration.suivante, 0)}, the second child another ${h.pct(h.P.rsa.majoration.suivante, 0)}, then each further child ${h.pct(h.P.rsa.majoration.au_dela_troisieme_enfant, 0)}. The housing deduction stops rising once the household reaches three people.</p>
+${h.table(['Couple', 'Flat-rate amount', 'Housing deduction', 'RSA with no income, housing aid received'], [0, 1, 2, 3].map((e) => [e ? `${e} child${e > 1 ? 'ren' : ''}` : 'No children', h.eur(h.M.forfaitaireRsa(true, e), 2), h.eur(cpl(h, e).fl, 2), h.eur(cpl(h, e).rsa, 2)]), 'Scale of 1 April 2026, excluding family allowances (estimate)', ['l', 'r', 'r', 'r'])}
+<p>The table leaves out allocations familiales (child benefit), which also count as income from the second child. A family’s actual payment is therefore lower; the page on ${h.a('rsa-allocations-familiales', 'RSA and family allowances')} does the full sum.</p>
+<!--mini:rsaCouple-->
+
+<h2>Julie and Marc: one wage, shared</h2>
+<p>Julie and Marc live together in Lille with no children. Marc has found a half-time job paying ${h.eur(sal)} net a month. Julie has no income left. They receive housing aid. The couple’s flat rate is ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}. The CAF takes off the two-person housing deduction, ${h.eur(cpl(h, 0, sal).fl, 2)}, then Marc’s pay. The household is left with ${h.eur(cpl(h, 0, sal).rsa, 2)} of RSA.</p>
+<p>What many couples miss: this RSA does not belong to Julie. It is paid to the household, and Marc’s wage reduces it exactly as if Julie had earned it. If Marc moves to full time on the Smic (minimum wage), RSA disappears. The ${h.a('prime-activite-couple', 'activity bonus for couples')}, on the other hand, worked out by the CAF with a different formula described by ${h.src('spPa', 'service-public.fr')}, rewards that wage: it only deducts part of it. The two benefits are claimed separately.</p>
+
+<h2>With children: three amounts to take off</h2>
+<p>Now take a couple with two children under 14, receiving housing aid. One parent earns ${h.eur(1000)} net a month, the other stays at home. The flat rate rises to ${h.eur(h.M.forfaitaireRsa(true, 2), 2)}. Three amounts come off it, though: the wage, the ${h.eur(h.M.forfaitLogement(h.P.rsa.montant_forfaitaire, 4, h.P.rsa), 2)} housing deduction, and the ${h.eur(h.P.af.tranches_nettes.deux[0], 2)} of allocations familiales paid for two children. The household’s estimated RSA is down to ${h.eur(h.M.rsa({ couple: true, enfants: 2, revenus: 1000, autres: h.P.af.tranches_nettes.deux[0], forfaitLogement: true }).rsa, 2)}. Yet the couple’s disposable income is still higher than with no wage at all, because the activity bonus is added on top. That is why a couple with children should never judge a return to work on the drop in RSA alone: look at wage, RSA and bonus together, the way the CAF pays them.</p>
+
+<h2>Moving in together: the risky moment</h2>
+<p>Two single people each on RSA, without housing aid, receive ${h.eur(2 * h.P.rsa.montant_forfaitaire, 2)} between them. Once they are a couple, their household is entitled to ${h.eur(h.M.forfaitaireRsa(true, 0), 2)}, which is ${h.eur(2 * h.P.rsa.montant_forfaitaire - h.M.forfaitaireRsa(true, 0), 2)} less each month. That is not a penalty, just the scale. For service-public.fr, a couple means marriage, a Pacs (civil partnership) or concubinage, that is, living together unmarried: you do not need to be married or registered to form one household.</p>
+<p>Reporting late is expensive. The ${h.src('spRsa', 'service-public.fr RSA sheet')} says any change in family situation must be reported quickly; otherwise the CAF can claim back overpaid sums for two years, by deducting them from future benefits. You can write to the CAF’s commission de recours amiable (amicable appeals board) to ask for the debt to be waived.</p>
+
+<h2>Rules that change when there are two of you</h2>
+<p>Several reduction rules only target claimants without a partner. A hospital stay of more than 60 days, which halves RSA for a single person, does not apply to a couple. If one partner is imprisoned for more than 60 days, the other’s entitlement is reviewed and the detained partner leaves the household for the calculation. As for penalties, the cut is capped at 50% as soon as someone else lives in the household.</p>
+<p>Support runs through a single named adviser appointed by the body you are referred to, and through an engagement contract. If household income averages under €500 a month, job seeking becomes compulsory, according to service-public.fr.</p>
+
+<h2>Filing as two without mistakes</h2>
+<p>The quarterly return is joint. Since 1 March 2025 it comes pre-filled with both partners’ wages and benefits, at the net social amount, for months M-2 to M-4. Each partner checks their own lines; maintenance received from an ex-partner is added by hand. The ${h.a('simulateur-rsa', 'RSA calculator')} lets you test the effect of either partner starting work before you report it, and the page on ${h.a('rsa-cumul-salaire', 'RSA and wages')} explains how the activity bonus takes over.</p>
+`,
+  },
+});

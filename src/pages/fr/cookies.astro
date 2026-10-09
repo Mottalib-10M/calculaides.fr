@@ -1,0 +1,19 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'fr';
+const updated = '2026-10-09';
+---
+<PageLayout title={`Cookies – ${SITE_NAMES[lang]}`} description="CalculAides ne dépose aucun cookie et ne charge aucun outil de mesure : vos revenus, votre loyer et votre situation familiale saisis dans les simulateurs ne quittent pas votre appareil." lang={lang} noindex={true} breadcrumbs={[{ label: 'Cookies' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Cookies</h1>
+    <p>CalculAides <strong>ne dépose aucun cookie</strong>. Il n’affiche pas de bandeau de consentement, parce qu’il n’y a rien à accepter ni à refuser. Le détail des traitements figure dans la <a href={route('privacy', lang)}>politique de confidentialité</a>.</p>
+    <h2>Les simulateurs ne gardent rien</h2>
+    <p>Simulateur d’APL, de prime d’activité, de RSA, d’allocations familiales ou d’AAH : chacun calcule dans votre navigateur. Votre loyer, vos revenus, le nombre de vos enfants ne sont écrits ni dans un cookie, ni dans le stockage local, ni envoyés à un serveur ; ils disparaissent à la fermeture de la page.</p>
+    <h2>Aucun outil de mesure</h2>
+    <p>Le site ne charge ni statistiques d’audience, ni outil d’enregistrement des visites, ni publicité, ni bouton de réseau social. Le simulateur intégré sur d’autres sites en iframe suit la même règle.</p>
+    <h2>Ce qui pourrait changer</h2>
+    <p>Si un outil de mesure devait un jour être ajouté, cette page et la politique de confidentialité seraient mises à jour avant sa mise en service, avec sa finalité et la manière de s’y opposer. Question : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Mise à jour : {updated}.</p>
+  </div>
+</PageLayout>

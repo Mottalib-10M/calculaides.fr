@@ -1,0 +1,28 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import LegalIdentity from '../../components/LegalIdentity.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, LEGAL, SITE_NAMES, SITE_URL } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'en';
+---
+<PageLayout title={`Legal notice – ${SITE_NAMES[lang]}`} description="Publisher, publication director, host, intellectual property, limits of liability and governing law for this site of calculators for French CAF welfare benefits." lang={lang} noindex={true} breadcrumbs={[{ label: 'Legal notice' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Legal notice</h1>
+    <p>Information published under article 6 III-1 of French Act 2004-575 of 21 June 2004 on confidence in the digital economy.</p>
+    <h2>Publisher</h2>
+    <LegalIdentity lang={lang} />
+    <p>Publication director: {AUTHOR_NAME}, responsible for the content published on {SITE_URL}.</p>
+    <h2>Host</h2>
+    <LegalIdentity mode="hosting" lang={lang} />
+    <h2>Purpose and no advice</h2>
+    <p>The site offers free calculators and guides on the benefits paid by the French family allowance funds (CAF), based on the scales published in the Journal officiel. Results are <strong>estimates</strong> computed from the visitor’s inputs: they are not a decision, personal legal advice or a guarantee of entitlement. Only the competent fund (CAF or MSA) works out and notifies an entitlement. The site is independent: it is not affiliated with the national family allowance fund (CNAF), the CAF offices, the MSA or any government body, and uses none of their logos. Method and limits: <a href={route('method', lang)}>calculation method</a>.</p>
+    <h2>Limits of liability</h2>
+    <p>Parameters are re-read against their sources at each uprating and the engine is checked by automated tests, with no guarantee that errors are absent. The publisher cannot be held liable for a decision made solely on an estimate. Report an error through the <a href={route('contact', lang)}>contact</a> page.</p>
+    <h2>Intellectual property</h2>
+    <p>Text, graphics and code are protected and remain the publisher’s property; short quotations are allowed with a link to the original page. Official texts and public data are reused under the <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence" rel="nofollow noopener" target="_blank">Etalab Open Licence</a>.</p>
+    <h2>Embedding the calculator</h2><p>The housing aid calculator may be embedded free of charge in an iframe, keeping the visible link: see the <a href={route('widget', lang)}>embed page</a>.</p>
+    <h2>Personal data</h2><p>Inputs never leave your browser. No cookie, no analytics. See the <a href={route('privacy', lang)}>privacy policy</a> and the <a href={route('cookies', lang)}>cookies</a> page.</p>
+    <h2>Reporting</h2><p>Unlawful content: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, with the page address and the reason.</p>
+    <h2>Governing law</h2><p>French law. Failing an amicable settlement, the competent courts of {LEGAL.jurisdiction}. Updated: {LAST_UPDATED}.</p>
+  </div>
+</PageLayout>

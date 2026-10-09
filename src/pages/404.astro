@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { route } from '../i18n/routes';
+---
+<BaseLayout title="Page introuvable – CalculAides" description="Cette page n’existe pas. Page not found." lang="fr" noindex={true}>
+  <div class="mx-auto max-w-3xl px-4 py-16">
+    <h1 class="text-3xl font-bold text-navy-900">Cette page n’existe pas</h1>
+    <p class="mt-4 text-navy-700">L’adresse ne mène nulle part, peut-être parce qu’une page a changé de nom. Les simulateurs sont ici :</p>
+    <ul class="mt-4 list-disc space-y-1 pl-5 text-navy-800">
+      <li><a class="underline" href={route('simulateur-apl', 'fr')}>Aide au logement (APL, ALF, ALS)</a></li>
+      <li><a class="underline" href={route('simulateur-prime-activite', 'fr')}>Prime d’activité</a></li>
+      <li><a class="underline" href={route('simulateur-rsa', 'fr')}>RSA</a></li>
+      <li><a class="underline" href={route('simulateur-allocations-familiales', 'fr')}>Allocations familiales</a></li>
+      <li><a class="underline" href={route('home', 'fr')}>Toutes les aides en un calcul</a></li>
+    </ul>
+    <p class="mt-8 text-navy-700" lang="en">Page not found. The English calculators start here: <a class="underline" href={route('home', 'en')}>French CAF benefits in one calculation</a>.</p>
+  </div>
+</BaseLayout>

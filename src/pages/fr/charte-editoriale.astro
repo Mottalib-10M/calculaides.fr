@@ -1,0 +1,27 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { AUTHOR_NAME, CONTACT_EMAIL, LAST_UPDATED, REVIEW_CYCLE_MONTHS, SITE_NAMES } from '../../data/site-config';
+import { route } from '../../i18n/routes';
+const lang = 'fr';
+---
+<PageLayout title={`Charte éditoriale – ${SITE_NAMES[lang]}`} description="D’où viennent les barèmes des aides CAF publiés ici, qui en répond, à quel rythme ils sont revus après chaque revalorisation, et ce qui se passe quand une erreur est signalée." lang={lang} noindex={true} breadcrumbs={[{ label: 'Charte éditoriale' }]} showAuthor={false}>
+  <div class="prose prose-slate max-w-none">
+    <h1>Charte éditoriale et politique de correction</h1>
+    <p>Une aide sociale fait souvent la différence entre boucler le mois ou non. Un montant faux peut faire renoncer à une demande, ou au contraire faire compter sur une somme qui ne viendra pas. Voici d’où viennent nos chiffres et ce que nous faisons quand l’un d’eux est faux.</p>
+    <h2>Responsabilité</h2><p>Contenus et calculs sont sous la responsabilité de {AUTHOR_NAME}. Contact : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p>
+    <h2>Sources primaires uniquement</h2>
+    <ul>
+      <li><strong>Légifrance et le Journal officiel</strong> : code de la sécurité sociale, code de la construction et de l’habitation, décrets de revalorisation, arrêtés sur les aides au logement ;</li>
+      <li><strong>service-public.fr</strong> : fiches des prestations, avec leur date de vérification ;</li>
+      <li><strong>les bulletins officiels du ministère chargé de la sécurité sociale</strong> : instructions de revalorisation des prestations familiales.</li>
+    </ul>
+    <p>Aucun montant n’est repris d’un blog, d’un forum ou d’un autre simulateur. Quand un chiffre de l’année n’est pas encore publié, la page le dit et emploie la dernière valeur officielle.</p>
+    <h2>Estimations, jamais des décisions</h2><p>Chaque résultat est une estimation fondée sur vos saisies et sur le barème en vigueur. Les règles de détail (ressources exclues, situations particulières, rappels) sont appliquées par la CAF sur le dossier : le montant notifié prime toujours sur le nôtre.</p>
+    <h2>Tests avant publication</h2><p>Les tableaux et exemples publiés par l’administration (montants du RSA et de la prime d’activité par composition du foyer, forfaits logement, allocations familiales par tranche, loyers plafonds de l’arrêté d’octobre) sont recalculés à chaque compilation. Un écart bloque la publication.</p>
+    <h2>Calendrier de mise à jour</h2><p>Revue au 1er avril (prestations familiales, RSA, prime d’activité, AAH), au 1er octobre (aides au logement) et au moins tous les {REVIEW_CYCLE_MONTHS} mois. La date affichée vient du fichier de paramètres.</p>
+    <h2>Traitement des erreurs</h2>
+    <ol><li>Vérification contre la source primaire.</li><li>Correction des paramètres ou du code, ajout d’un test.</li><li>Nouvelle date sur la page concernée.</li></ol>
+    <h2>Indépendance</h2><p>Aucun lien commercial avec un organisme, un service de démarches payant ou un annonceur. Toute relation de ce type serait indiquée dans le texte.</p>
+    <p>Voir aussi la <a href={route('method', lang)}>méthode de calcul</a>. Version : {LAST_UPDATED}.</p>
+  </div>
+</PageLayout>

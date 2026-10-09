@@ -1,0 +1,20 @@
+{
+ "accent": "#0E6B5C",
+ "symbol": "+€",
+ "variants": [
+  {
+   "file": "og-fr.png",
+   "title": "Aides CAF 2026\ncalculez vos montants",
+   "subtitle": "APL · Prime d'activité · RSA · ARS · Allocations familiales · AAH",
+   "badge": "Barèmes officiels d'avril et d'octobre 2026",
+   "brand": "CalculAides"
+  },
+  {
+   "file": "og-en.png",
+   "title": "French welfare benefits 2026\nestimate your amounts",
+   "subtitle": "Housing aid · Activity bonus · RSA · Family benefits · AAH",
+   "badge": "Official April and October 2026 scales",
+   "brand": "CalculAides"
+  }
+ ]
+}
