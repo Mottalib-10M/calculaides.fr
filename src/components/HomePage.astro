@@ -33,7 +33,7 @@ const fr = lang === 'fr';
   <header class="mb-6">
     <h1 class="text-3xl font-bold text-navy-900 md:text-4xl">{x.h1}</h1>
     <p class="mt-3 text-lg text-navy-700">{x.intro}</p>
-    <p class="mt-3 text-sm text-navy-600">{fr ? 'Barèmes vérifiés le' : 'Rates checked on'} <time datetime={LAST_UPDATED}>{displayDate(LAST_UPDATED, fr ? 'fr-FR' : 'en-GB')}</time> · {fr ? 'par' : 'by'} <a href={route('about', lang)} class="underline">{AUTHOR_NAME}</a> · <a href={route('method', lang)} class="underline">{fr ? 'Méthode de calcul' : 'Calculation method'}</a></p>
+    <p class="mt-3 text-sm text-navy-600">{fr ? 'Par' : 'By'} <a href={route('about', lang)} class="underline">{AUTHOR_NAME}</a> · <a href={route('method', lang)} class="underline">{fr ? 'Méthode de calcul' : 'Calculation method'}</a></p>
   </header>
   <div data-outil><HomeCalc client:load lang={lang} /></div>
   <Clamp text={resume} lang={lang} id="clamp-home" sentences={2} class="mt-8" />
